@@ -57,7 +57,7 @@ const (
 	State_SwapInReceiver_AwaitTxConfirmation          StateType = "State_SwapInReceiver_AwaitTxConfirmation"
 	State_SwapInReceiver_ValidateTxAndPayClaimInvoice StateType = "State_SwapInReceiver_ValidateTxAndPayClaimInvoice"
 	State_SwapInReceiver_ClaimSwap                    StateType = "State_SwapInReceiver_ClaimSwap"
-	State_SwapInReceiver_BuildSigHash                 StateType = "State_SwapOutSender_BuildSigHash"
+	State_SwapInReceiver_BuildSigHash                 StateType = "State_SwapInReceiver_BuildSigHash"
 	State_SwapInReceiver_SendCoopClose                StateType = "State_SwapInReceiver_SendCoopClose"
 )
 
