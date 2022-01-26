@@ -128,7 +128,7 @@ func (p *CLightningProxy) StartProxy() error {
 type LndRpcClient struct {
 	Rpc   lnrpc.LightningClient
 	RpcV2 routerrpc.RouterClient
-	conn  *grpc.ClientConn
+	Conn  *grpc.ClientConn
 }
 
 func NewLndRpcClient(host, certPath, macaroonPath string, options ...grpc.DialOption) (*LndRpcClient, error) {
@@ -164,16 +164,16 @@ func NewLndRpcClient(host, certPath, macaroonPath string, options ...grpc.DialOp
 	ctx, cancel := context.WithTimeout(context.Background(), TIMEOUT)
 	defer cancel()
 
-	conn, err := grpc.DialContext(ctx, host, opts...)
+	Conn, err := grpc.DialContext(ctx, host, opts...)
 	if err != nil {
 		return nil, fmt.Errorf("NewMacaroonCredential() %w", err)
 	}
 
-	lnRpc := lnrpc.NewLightningClient(conn)
-	routerRpc := routerrpc.NewRouterClient(conn)
+	lnRpc := lnrpc.NewLightningClient(Conn)
+	routerRpc := routerrpc.NewRouterClient(Conn)
 	return &LndRpcClient{
 		Rpc:   lnRpc,
 		RpcV2: routerRpc,
-		conn:  conn,
+		Conn:  Conn,
 	}, nil
 }
