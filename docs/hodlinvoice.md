@@ -59,3 +59,15 @@ Note over B: cancel hodl payment
 Note over B: broadcast claim tx (pk alice)
 end
 ```
+
+
+# Pros and cons
+
+## Pros
+  - No onchain tx if no route on lightning payment
+  - Smaller chance of payment failures (near 0)
+## Cons
+  - Trustless Claim takes more onchain tx
+  - More Refactoring
+  - (very small) chance of force close
+  - More reliance on node implementation

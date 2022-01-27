@@ -22,10 +22,11 @@ type LndHodlTest struct {
 	suite.Suite
 	assertions *AssertionCounter
 
-	bitcoind    *testframework.BitcoinNode
-	lightningds []*testframework.LndNode
-	scid        string
-	lcid        uint64
+	bitcoind     *testframework.BitcoinNode
+	lnds         []*testframework.LndNode
+	lighntningds []*testframework.CLightningNode
+	scid         string
+	lcid         uint64
 
 	channelBalances []uint64
 	walletBalances  []uint64
@@ -60,7 +61,7 @@ func (suite *LndHodlTest) SetupSuite() {
 	}
 	t.Cleanup(bitcoind.Kill)
 
-	var lightningds []*testframework.LndNode
+	var lnds []*testframework.LndNode
 	for i := 1; i <= 2; i++ {
 		lightningd, err := testframework.NewLndNode(testDir, bitcoind, i)
 		if err != nil {
@@ -68,7 +69,7 @@ func (suite *LndHodlTest) SetupSuite() {
 		}
 		t.Cleanup(lightningd.Kill)
 
-		lightningds = append(lightningds, lightningd)
+		lnds = append(lnds, lightningd)
 	}
 
 	// Start nodes
@@ -77,32 +78,26 @@ func (suite *LndHodlTest) SetupSuite() {
 		t.Fatalf("bitcoind.Run() got err %v", err)
 	}
 
-	for _, lightningd := range lightningds {
-		err = lightningd.Run(true, true)
+	for _, lnd := range lnds {
+		err = lnd.Run(true, true)
 		if err != nil {
 			t.Fatalf("lightningd.Run() got err %v", err)
 		}
 	}
 
 	// Setup channel ([0] fundAmt(10^7) ---- 0 [1])
-	scid, err := lightningds[1].OpenChannel(lightningds[0], fundAmt, true, true, true)
+	scid, err := lnds[1].OpenChannel(lnds[0], fundAmt, true, true, true)
 	if err != nil {
 		t.Fatalf("lightingds[0].OpenChannel() %v", err)
 	}
 
-	lcid, err := lightningds[1].ChanIdFromScid(scid)
+	lcid, err := lnds[1].ChanIdFromScid(scid)
 	if err != nil {
 		t.Fatalf("lightingds[0].ChanIdFromScid() %v", err)
 	}
 
-	// Give btc to node [1] in order to initiate swap-in.
-	_, err = lightningds[1].FundWallet(10*fundAmt, true)
-	if err != nil {
-		t.Fatalf("lightningds[1].FundWallet() %v", err)
-	}
-
 	suite.bitcoind = bitcoind
-	suite.lightningds = lightningds
+	suite.lnds = lnds
 	suite.scid = scid
 	suite.lcid = lcid
 }
@@ -111,7 +106,7 @@ func (suite *LndHodlTest) BeforeTest(suiteName, testName string) {
 	fmt.Printf("===RUN %s/%s\n", suiteName, testName)
 	// make shure we dont have pending balances
 	var err error
-	for _, lightningd := range suite.lightningds {
+	for _, lightningd := range suite.lnds {
 		err = testframework.WaitForWithErr(func() (bool, error) {
 			hasPending, err := lightningd.HasPendingHtlcOnChannel(suite.scid)
 			return !hasPending, err
@@ -121,7 +116,7 @@ func (suite *LndHodlTest) BeforeTest(suiteName, testName string) {
 
 	var channelBalances []uint64
 	var walletBalances []uint64
-	for _, lightningd := range suite.lightningds {
+	for _, lightningd := range suite.lnds {
 		b, err := lightningd.GetBtcBalanceSat()
 		suite.Require().NoError(err)
 		walletBalances = append(walletBalances, b)
@@ -154,7 +149,7 @@ func (suite *LndHodlTest) Test_HodlInvoice() {
 	var err error
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
-	lightningds := suite.lightningds
+	lightningds := suite.lnds
 	bitcoind := suite.bitcoind
 
 	// get ctv
