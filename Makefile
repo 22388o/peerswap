@@ -59,6 +59,16 @@ proto:
 	protoc --go_out=. --go_opt=paths=source_relative \
     	--go-grpc_out=. --go-grpc_opt=paths=source_relative \
     	./peerswaprpc/peerswaprpc.proto
+	protoc --grpc-gateway_out . \
+        --grpc-gateway_opt logtostderr=true \
+        --grpc-gateway_opt paths=source_relative \
+        --grpc-gateway_opt grpc_api_configuration=./peerswaprpc/peerswap.yaml \
+		./peerswaprpc/peerswaprpc.proto
+	protoc -I . --openapiv2_out . \
+        --openapiv2_opt logtostderr=true \
+        --openapiv2_opt grpc_api_configuration=./peerswaprpc/peerswap.yaml \
+        ./peerswaprpc/peerswaprpc.proto
+.PHONY: proto
 
 docs/mmd/swap-in-receiver-states.md:
 	go run ./contrib/stateparser.go -out docs/mmd/swap-in-receiver-states.md -fsm swap_in_receiver

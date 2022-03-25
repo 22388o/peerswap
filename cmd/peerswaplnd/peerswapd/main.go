@@ -4,12 +4,15 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/sputn1ck/peerswap/log"
 	"github.com/sputn1ck/peerswap/version"
+	"google.golang.org/grpc/credentials/insecure"
 	"io"
 	"io/ioutil"
 	log2 "log"
 	"net"
+	"net/http"
 	"os"
 	"os/signal"
 	"path/filepath"
@@ -292,7 +295,23 @@ func run() error {
 		}
 	}()
 	defer grpcSrv.GracefulStop()
-	log.Infof("peerswapd listening on %v", cfg.Host)
+	log.Infof("peerswapd grpc listening on %v", cfg.Host)
+	if cfg.RestHost != "" {
+		mux := runtime.NewServeMux()
+		opts := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
+		err := peerswaprpc.RegisterPeerSwapHandlerFromEndpoint(ctx, mux, cfg.Host, opts)
+		if err != nil {
+			return err
+		}
+		go func() {
+			err := http.ListenAndServe(cfg.RestHost, mux)
+			if err != nil {
+				log2.Fatal(err)
+			}
+		}()
+
+		log.Infof("peerswapd rest listening on %v", cfg.RestHost)
+	}
 	<-shutdown
 	return nil
 }

@@ -6,6 +6,7 @@ require (
 	github.com/btcsuite/btcd v0.22.0-beta.0.20211005184431-e3449998be39
 	github.com/btcsuite/btcutil v1.0.3-0.20210527170813-e2ba6805a890
 	github.com/btcsuite/btcutil/psbt v1.0.3-0.20210527170813-e2ba6805a890
+	github.com/grpc-ecosystem/grpc-gateway/v2 v2.5.0
 	github.com/jessevdk/go-flags v1.5.0
 	github.com/lightninglabs/protobuf-hex-display v1.4.3-hex-display
 	github.com/lightningnetwork/lnd v0.14.1-beta
@@ -18,6 +19,6 @@ require (
 	go.etcd.io/bbolt v1.3.6
 	golang.org/x/crypto v0.0.0-20211117183948-ae814b36b871 // indirect
 	google.golang.org/grpc v1.38.0
-	google.golang.org/protobuf v1.26.0
+	google.golang.org/protobuf v1.27.1
 	gopkg.in/macaroon.v2 v2.1.0
 )

@@ -19,6 +19,7 @@ const (
 
 var (
 	DefaultPeerswapHost   = "localhost:42069"
+	DefaultRestHost       = "localhost:42070"
 	DefaultLndHost        = "localhost:10009"
 	DefaultTlsCertPath    = filepath.Join(defaultLndDir, "tls.cert")
 	DefaultMacaroonPath   = filepath.Join(defaultLndDir, "data", "chain", "bitcoin", DefaultNetwork, "admin.macaroon")
@@ -34,6 +35,7 @@ var (
 
 type PeerSwapConfig struct {
 	Host       string   `long:"host" description:"host to listen on for grpc connections"`
+	RestHost   string   `long:"resthost" description:"host to listen for rest connection"`
 	ConfigFile string   `long:"configfile" description:"path to configfile"`
 	DataDir    string   `long:"datadir" description:"peerswap datadir"`
 	LogLevel   LogLevel `long:"loglevel" description:"loglevel (1=Info, 2=Debug)"`
@@ -123,6 +125,7 @@ type LndConfig struct {
 func DefaultConfig() *PeerSwapConfig {
 	return &PeerSwapConfig{
 		Host:       DefaultPeerswapHost,
+		RestHost:   DefaultRestHost,
 		ConfigFile: DefaultConfigFile,
 		DataDir:    DefaultDatadir,
 		LndConfig: &LndConfig{
